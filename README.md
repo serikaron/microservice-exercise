@@ -1,2 +1,2 @@
-# microservice_exercise
-microservice_exercise
+# microservice-exercise
+microservice-exercise
