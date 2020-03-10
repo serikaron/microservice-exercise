@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package proto.echo;
+option go_package = "proto";
+
+service Echo {
+    rpc Echo (EchoReq) returns (EchoRsp);
+}
+
+message EchoReq {
+    string msg = 1;
+}
+
+message EchoRsp {
+    string msg = 1;
+}
