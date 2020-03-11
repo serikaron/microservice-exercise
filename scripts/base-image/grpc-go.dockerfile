@@ -44,7 +44,7 @@ RUN git clone https://github.com/google/protobuf.git && \
     cd .. && \
     rm -r protobuf
 
-ENV GO111MODULE=on
+ENV GO111MODULE=on CGO_ENABLED=0
 
 # Get the source from GitHub
 RUN go get google.golang.org/grpc@v1.27.1 && \
