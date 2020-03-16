@@ -8,7 +8,7 @@ import (
 	"net"
 )
 
-//go:generate protoc -I../ --go_out=plugins=grpc,paths=source_relative:../proto/ echo.proto
+//go:generate protoc -I../proto --go_out=plugins=grpc,paths=source_relative:../proto/ echo.proto
 
 const (
 	port = ":55555"
