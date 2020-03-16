@@ -19,7 +19,7 @@ type EchoService struct {
 
 func (es *EchoService) Echo(_ context.Context, in *proto.EchoReq) (*proto.EchoRsp, error) {
 	log.Println("req msg: ", in.Msg)
-	return &proto.EchoRsp{Msg: in.Msg}, nil
+	return &proto.EchoRsp{Msg: "failed " + in.Msg}, nil
 }
 
 func main() {
