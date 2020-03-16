@@ -1,4 +1,4 @@
-FROM grpc-go:latest as development
+FROM serikaron/grpc-go:latest as development
 
 COPY . /echo/
 
@@ -21,4 +21,4 @@ CMD ["/echo-service"]
 FROM alpine:3.11 as echo-client
 COPY --from=development /echo-client /
 EXPOSE 55555
-CMD ["/echo-client"]
+ENTRYPOINT ["/echo-client"]
