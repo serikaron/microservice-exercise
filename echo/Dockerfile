@@ -7,7 +7,7 @@ WORKDIR /echo
 RUN mkdir -p /echo/proto && \
     protoc -I./proto --go_out=plugins=grpc,paths=source_relative:./proto/ echo.proto
 
-RUN go test echo/server
+#RUN go test echo/server
 
 RUN go build -o /echo-service echo/server && \
     go build -o /echo-client echo/client

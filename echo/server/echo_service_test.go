@@ -3,21 +3,35 @@ package main
 import (
 	"context"
 	"echo/proto"
+	"flag"
+	"google.golang.org/grpc"
 	"testing"
 )
 
-func TestEchoService_Echo(t *testing.T) {
-	type testParam struct {
-		sendMsg string
-		recvMsg string
-		same    bool
-	}
+var host string
 
-	check := func(server *EchoService, t *testing.T, param testParam) {
-		t.Helper()
+func init() {
+	flag.StringVar(&host, "host", "", "echo-service host")
+}
 
+type testParam struct {
+	sendMsg string
+	recvMsg string
+	same    bool
+}
+
+type I interface {
+	Echo(req *proto.EchoReq) (*proto.EchoRsp, error)
+}
+
+func runTest(server I, t *testing.T) {
+	t.Helper()
+
+	check := func(server I, t *testing.T, param testParam) {
 		req := &proto.EchoReq{Msg: param.sendMsg}
-		rsp, err := server.Echo(context.Background(), req)
+		var rsp *proto.EchoRsp
+		var err error
+		rsp, err = server.Echo(req)
 		if err != nil {
 			t.Errorf("call server.Echo failed: %v", err)
 			return
@@ -27,12 +41,8 @@ func TestEchoService_Echo(t *testing.T) {
 		//t.Logf("test failed, param: %v, rsp: %v, actual:%v", param, rsp, actual)
 		if actual != param.same {
 			t.Errorf("test failed, param: %v, rsp: %v", param, rsp)
-			//} else {
-			//	t.Log("test pass")
 		}
 	}
-
-	server := &EchoService{}
 
 	t.Run("Expect same", func(t *testing.T) {
 		check(server, t, testParam{
@@ -49,4 +59,36 @@ func TestEchoService_Echo(t *testing.T) {
 			same:    false,
 		})
 	})
+}
+
+type functionTestingServer struct {
+	server *EchoService
+}
+
+func (s *functionTestingServer) Echo(req *proto.EchoReq) (*proto.EchoRsp, error) {
+	return s.server.Echo(context.Background(), req)
+}
+
+func TestFunctional(t *testing.T) {
+	server := &functionTestingServer{server: &EchoService{}}
+	runTest(server, t)
+}
+
+type integrationTestingServer struct {
+	conn *grpc.ClientConn
+}
+
+func (s *integrationTestingServer) Echo(req *proto.EchoReq) (*proto.EchoRsp, error) {
+	client := proto.NewEchoClient(s.conn)
+	return client.Echo(context.Background(), req)
+}
+
+func TestIntegration(t *testing.T) {
+	t.Logf("Host :%v", host)
+	conn, err := grpc.Dial(host, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		t.Fatal("grpc.Dial failed: ", err)
+	}
+
+	runTest(&integrationTestingServer{conn: conn}, t)
 }
