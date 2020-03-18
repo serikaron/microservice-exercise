@@ -31,4 +31,9 @@ func main() {
 	}
 
 	log.Println("rsp: ", rsp)
+	if rsp.Msg != "an echo message" {
+		os.Exit(1)
+	} else {
+		os.Exit(0)
+	}
 }
