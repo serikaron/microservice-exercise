@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package proto.chat;
+option go_package = "proto";
+
+service Chat {
+    rpc Listen (ListenReq) returns (stream ListenRsp);
+    rpc Say (SayReq) returns (SayRsp);
+    rpc AnotherListen (ListenReq) returns (stream ListenRsp);
+}
+
+message ListenReq {
+}
+
+message ListenRsp {
+    string msg = 1;
+}
+
+message SayReq {
+    string msg = 1;
+}
+
+message SayRsp {
+
+}
