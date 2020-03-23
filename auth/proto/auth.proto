@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package proto.auth;
+option go_package = "proto";
+
+service Auth {
+    rpc Login (LoginReq) returns (LoginRsp);
+}
+
+message LoginReq {
+    string username = 1;
+    string password = 2;
+}
+
+message LoginRsp {
+    string jwt = 1;
+}

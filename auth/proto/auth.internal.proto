@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package proto.auth.internal;
+option go_package = "proto";
+
+service AuthInternal {
+    rpc GetSignKey (GetSignKeyReq) returns (GetSignKeyRsp);
+}
+
+message GetSignKeyReq {
+}
+
+message GetSignKeyRsp {
+    uint32 kid = 1;
+    string key = 2;
+    string alg = 3;
+}

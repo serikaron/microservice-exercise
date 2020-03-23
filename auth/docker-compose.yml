@@ -1,0 +1,21 @@
+version: "3.7"
+services:
+  auth-service:
+    build:
+      context: ./
+      dockerfile: service/Dockerfile
+    image: auth-service
+    environment:
+      - auth_service_port=12345
+      - auth_internal_service_port=12346
+
+  integration-test-client:
+    build:
+      context: ./
+      dockerfile: integration-test-client/Dockerfile
+    image: auth-test-client
+    depends_on:
+      - auth-service
+    environment:
+      - auth_service_port=12345
+      - auth_internal_service_port=12346
