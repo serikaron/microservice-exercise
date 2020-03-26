@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"echo/proto"
+	"fmt"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -19,7 +20,9 @@ type EchoService struct {
 
 func (es *EchoService) Echo(_ context.Context, in *proto.EchoReq) (*proto.EchoRsp, error) {
 	log.Println("req msg: ", in.Msg)
-	return &proto.EchoRsp{Msg: in.Msg}, nil
+	serverName := "echo-service"
+	msg := fmt.Sprintf("Echo from service [%s]: %s", serverName, in.Msg)
+	return &proto.EchoRsp{Msg: msg}, nil
 }
 
 func main() {

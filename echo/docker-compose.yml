@@ -1,0 +1,22 @@
+version: "3"
+services:
+  echo-service:
+    image: serikaorn/echo-service
+    ports:
+      - "55555"
+    networks:
+      - echo-net
+    deploy:
+      replicas: 3
+
+  echo-client:
+    image: serikaron/echo-client
+    networks:
+      - echo-net
+    deploy:
+      replicas: 1
+    depends_on:
+      - echo-service
+
+networks:
+  echo-net:

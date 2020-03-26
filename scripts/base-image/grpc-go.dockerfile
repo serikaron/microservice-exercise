@@ -45,10 +45,12 @@ RUN git clone https://github.com/google/protobuf.git && \
     rm -r protobuf
 
 ENV GO111MODULE=on CGO_ENABLED=0
+#GOSUMDB="sum.golang.google.cn" GOPROXY=https://goproxy.cn,direct
 
 # Get the source from GitHub
 RUN go get google.golang.org/grpc@v1.27.1 && \
 # Install protoc-gen-go
     go get github.com/golang/protobuf@v1.3.4 && \
     go get -u github.com/golang/protobuf/protoc-gen-go@v1.3.4
+#    go get github.com/dgrijalva/jwt-go/v4
 

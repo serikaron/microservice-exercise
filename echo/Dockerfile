@@ -7,7 +7,7 @@ WORKDIR /echo
 RUN mkdir -p /echo/proto && \
     protoc -I./proto --go_out=plugins=grpc,paths=source_relative:./proto/ echo.proto
 
-#RUN go test echo/server
+#RUN go test echo/service
 
 RUN go build -o /echo-service echo/server && \
     go build -o /echo-client echo/client
@@ -15,7 +15,7 @@ RUN go build -o /echo-service echo/server && \
 FROM alpine:3.11 as echo-service
 COPY --from=development /echo-service /
 EXPOSE 55555
-CMD ["/echo-service"]
+ENTRYPOINT ["/echo-service"]
 
 FROM alpine:3.11 as echo-client
 COPY --from=development /echo-client /

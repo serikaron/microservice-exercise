@@ -33,7 +33,7 @@ func runTest(server I, t *testing.T) {
 		var err error
 		rsp, err = server.Echo(req)
 		if err != nil {
-			t.Errorf("call server.Echo failed: %v", err)
+			t.Errorf("call service.Echo failed: %v", err)
 			return
 		}
 
