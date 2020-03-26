@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+  chat-service:
+    image: 192.168.99.103:5000/chat-service
+    ports:
+      - "23456"
+    deploy:
+      replicas: 2
+    entrypoint: /chat-service --chat-service-port 23456 --redis-port 6379
+
+  monitor:
+    image: 192.168.99.103:5000/monitor
+    deploy:
+      replicas: 1
+
+  chater:
+    image: 192.168.99.103:5000/chater
+    deploy:
+      replicas: 1
+
+  redis:
+    image: redis:alpine
+    deploy:
+      replicas: 1

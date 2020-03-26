@@ -6,7 +6,6 @@ option go_package = "proto";
 service Chat {
     rpc Listen (ListenReq) returns (stream ListenRsp);
     rpc Say (SayReq) returns (SayRsp);
-    rpc AnotherListen (ListenReq) returns (stream ListenRsp);
 }
 
 message ListenReq {
@@ -21,5 +20,6 @@ message SayReq {
 }
 
 message SayRsp {
-
+    string msg = 1;
 }
+
