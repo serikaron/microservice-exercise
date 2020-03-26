@@ -1,10 +1,10 @@
 package pkg
 
 import (
-	"auth/proto"
 	"context"
 	"google.golang.org/grpc"
 	"log"
+	"mse/auth/proto"
 	"time"
 )
 

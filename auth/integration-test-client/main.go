@@ -1,11 +1,11 @@
 package main
 
 import (
-	"auth/pkg"
-	"auth/proto"
-	auth_testing "auth/testing"
 	"flag"
 	"fmt"
+	"mse/auth/pkg"
+	"mse/auth/proto"
+	auth_testing "mse/auth/testing"
 )
 
 func testLogin(ac *pkg.AuthClient) {

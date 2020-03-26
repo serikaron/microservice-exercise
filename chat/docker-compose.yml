@@ -3,7 +3,7 @@ services:
   chat-service:
     build:
       context: .
-      dockerfile: server/Dockerfile
+      dockerfile: service/Dockerfile
     image: 192.168.99.103:5000/chat-service
     environment:
       - chat_service_port=23456

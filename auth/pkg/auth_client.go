@@ -3,10 +3,10 @@ package pkg
 //go:generate protoc -I../proto --go_out=plugins=grpc,paths=source_relative:../proto/ auth.proto
 
 import (
-	"auth/proto"
 	"context"
 	"google.golang.org/grpc"
 	"log"
+	"mse/auth/proto"
 	"time"
 )
 

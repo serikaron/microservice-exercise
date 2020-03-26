@@ -1,11 +1,11 @@
 package main
 
 import (
-	"auth/proto"
 	"context"
 	"github.com/dgrijalva/jwt-go/v4"
 	"google.golang.org/grpc"
 	"log"
+	"mse/auth/proto"
 	"net"
 )
 

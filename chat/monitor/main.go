@@ -3,10 +3,10 @@ package main
 //go:generate protoc -I../proto --go_out=plugins=grpc,paths=source_relative:../proto/ chat.proto
 
 import (
-	"chat/pkg"
 	"flag"
 	"fmt"
 	"log"
+	"mse/chat/pkg"
 	"time"
 )
 

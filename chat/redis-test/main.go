@@ -1,10 +1,10 @@
 package main
 
 import (
-	"chat/pkg"
 	"flag"
 	"fmt"
 	"log"
+	"mse/chat/pkg"
 	"sync"
 	"time"
 )

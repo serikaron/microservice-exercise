@@ -1,12 +1,12 @@
 package main
 
 import (
-	"chat/pkg"
-	"chat/proto"
 	"flag"
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
+	"mse/chat/pkg"
+	"mse/chat/proto"
 	"net"
 )
 
@@ -17,7 +17,7 @@ import (
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	defer log.Println("server exit")
+	defer log.Println("service exit")
 
 	host := flag.String("chat-service-host", "", "chat service host")
 	port := flag.Uint("chat-service-port", 0, "chat service port")
@@ -35,7 +35,7 @@ func main() {
 	rdsAddr := fmt.Sprintf("%s:%d", *rdsHost, *rdsPort)
 	rdsPS := pkg.NewRedisPubSub(rdsAddr, "notify")
 	s := grpc.NewServer()
-	cs := NewChatService(rdsPS)
+	cs := NewChatService(&ChatNotifier{}, rdsPS)
 	defer cs.Close()
 	proto.RegisterChatServer(s, cs)
 
@@ -47,7 +47,7 @@ func main() {
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
-		log.Println("server stop")
+		log.Println("service stop")
 	}()
 
 	cs.Run(done)

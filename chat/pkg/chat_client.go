@@ -1,11 +1,11 @@
 package pkg
 
 import (
-	"chat/proto"
 	"context"
 	"google.golang.org/grpc"
 	"io"
 	"log"
+	"mse/chat/proto"
 	"time"
 )
 

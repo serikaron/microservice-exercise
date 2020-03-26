@@ -1,8 +1,6 @@
 package main
 
 import (
-	"chat/pkg"
-	pb "chat/proto"
 	"context"
 	"fmt"
 	"github.com/golang/protobuf/proto"
@@ -10,6 +8,8 @@ import (
 	"google.golang.org/grpc/status"
 	"log"
 	"math/rand"
+	"mse/chat/pkg"
+	pb "mse/chat/proto"
 	"time"
 )
 
@@ -37,10 +37,10 @@ type ChatService struct {
 	pubsub pkg.PubSub
 }
 
-func NewChatService(pubsub pkg.PubSub) *ChatService {
+func NewChatService(notifier Notifier, pubsub pkg.PubSub) *ChatService {
 	r := rand.Int()
 	name := fmt.Sprintf("%d", r)
-	hub := NewListenerHub(&ChatNotifier{})
+	hub := NewListenerHub(notifier)
 
 	return &ChatService{
 		name:   name,

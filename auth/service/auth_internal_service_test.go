@@ -1,8 +1,8 @@
 package main
 
 import (
-	"auth/proto"
 	"context"
+	"mse/auth/proto"
 	"reflect"
 	"testing"
 )
