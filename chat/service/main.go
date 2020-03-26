@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
-	"mse/chat/pkg"
-	"mse/chat/proto"
+	"mse/pkg"
+	"mse/proto"
 	"net"
 )
 

@@ -5,11 +5,11 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 	"google.golang.org/grpc"
 	"log"
-	"mse/auth/proto"
+	"mse/proto"
 	"net"
 )
 
-//go:generate protoc -I../proto --go_out=plugins=grpc,paths=source_relative:../proto/ auth.internal.proto
+//go:generate protoc -I../../proto --go_out=plugins=grpc,paths=source_relative:../../proto/ auth.internal.proto
 
 type AuthInternalService struct {
 }

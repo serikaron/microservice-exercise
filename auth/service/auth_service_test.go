@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"mse/auth/pkg"
-	"mse/auth/proto"
 	auth_testing "mse/auth/testing"
+	"mse/pkg"
+	"mse/proto"
 	"testing"
 )
 

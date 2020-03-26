@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"mse/chat/pkg"
+	pkg2 "mse/pkg"
 	"sync"
 	"time"
 )
@@ -17,7 +17,7 @@ func main() {
 	flag.Parse()
 	rdsAddr := fmt.Sprintf("%s:%d", *rdsHost, *rdsPort)
 	log.Println("connect to redis:", rdsAddr)
-	rdsPS := pkg.NewRedisPubSub(rdsAddr, "notify")
+	rdsPS := pkg2.NewRedisPubSub(rdsAddr, "notify")
 
 	c := rdsPS.Subscribe()
 

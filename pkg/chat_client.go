@@ -5,7 +5,7 @@ import (
 	"google.golang.org/grpc"
 	"io"
 	"log"
-	"mse/chat/proto"
+	"mse/proto"
 	"time"
 )
 

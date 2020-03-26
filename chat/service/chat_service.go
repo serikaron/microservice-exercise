@@ -8,12 +8,12 @@ import (
 	"google.golang.org/grpc/status"
 	"log"
 	"math/rand"
-	"mse/chat/pkg"
-	pb "mse/chat/proto"
+	"mse/pkg"
+	pb "mse/proto"
 	"time"
 )
 
-//go:generate protoc -I../proto --go_out=plugins=grpc,paths=source_relative:../proto/ chat.proto
+//go:generate protoc -I../../proto --go_out=plugins=grpc,paths=source_relative:../../proto/ chat.proto
 
 type ChatNotifier struct{}
 

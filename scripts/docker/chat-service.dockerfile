@@ -1,8 +1,10 @@
-FROM serikaron/go-dev as development
+FROM serika-registry:443/go-dev as development
 
+COPY pkg /mse/pkg
+COPY proto/*.proto proto/gen.go /mse/proto/
 COPY chat /mse/chat
 
-RUN go generate mse/chat/service && \
+RUN go generate mse/proto && \
     go build -o /chat-service mse/chat/service
 
 FROM alpine:3.11 as release

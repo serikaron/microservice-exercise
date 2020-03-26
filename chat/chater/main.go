@@ -1,14 +1,14 @@
 package main
 
-//go:generate protoc -I../proto --go_out=plugins=grpc,paths=source_relative:../proto/ chat.proto
+//go:generate protoc -I../../proto --go_out=plugins=grpc,paths=source_relative:../../proto/ chat.proto
 
 import (
 	"flag"
 	"fmt"
 	"log"
 	"math/rand"
-	"mse/chat/pkg"
-	"mse/chat/proto"
+	pkg2 "mse/pkg"
+	"mse/proto"
 	"time"
 )
 
@@ -24,7 +24,7 @@ func main() {
 	time.Sleep(10 * time.Second)
 
 	addr := fmt.Sprintf("%s:%d", *host, *port)
-	client := pkg.NewChatClient(addr)
+	client := pkg2.NewChatClient(addr)
 
 	r := rand.Int()
 	msg := fmt.Sprintf("%d", r)

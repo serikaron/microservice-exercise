@@ -1,12 +1,12 @@
 package main
 
-//go:generate protoc -I../proto --go_out=plugins=grpc,paths=source_relative:../proto/ chat.proto
+//go:generate protoc -I../../proto --go_out=plugins=grpc,paths=source_relative:../../proto/ chat.proto
 
 import (
 	"flag"
 	"fmt"
 	"log"
-	"mse/chat/pkg"
+	pkg2 "mse/pkg"
 	"time"
 )
 
@@ -18,7 +18,7 @@ func main() {
 	flag.Parse()
 
 	addr := fmt.Sprintf("%s:%d", *host, *port)
-	client := pkg.NewChatClient(addr)
+	client := pkg2.NewChatClient(addr)
 
 	done := make(chan bool)
 	defer close(done)

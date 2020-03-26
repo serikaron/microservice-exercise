@@ -4,7 +4,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
-	"mse/chat/proto"
+	"mse/proto"
 	"reflect"
 	"testing"
 )

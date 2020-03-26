@@ -4,7 +4,7 @@ import (
 	"context"
 	"google.golang.org/grpc"
 	"log"
-	"mse/auth/proto"
+	"mse/proto"
 	"time"
 )
 
