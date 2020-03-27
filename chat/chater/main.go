@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	pkg2 "mse/pkg"
+	"mse/pkg"
 	"mse/proto"
 	"time"
 )
@@ -24,7 +24,7 @@ func main() {
 	time.Sleep(10 * time.Second)
 
 	addr := fmt.Sprintf("%s:%d", *host, *port)
-	client := pkg2.NewChatClient(addr)
+	client := pkg.NewChatClient(addr)
 
 	r := rand.Int()
 	msg := fmt.Sprintf("%d", r)

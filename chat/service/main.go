@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"log"
 	"mse/pkg"
 	"mse/proto"
@@ -34,7 +35,11 @@ func main() {
 
 	rdsAddr := fmt.Sprintf("%s:%d", *rdsHost, *rdsPort)
 	rdsPS := pkg.NewRedisPubSub(rdsAddr, "notify")
-	s := grpc.NewServer()
+	creds, err := credentials.NewServerTLSFromFile("res/certs/server.pem", "res/certs/server.key")
+	if err != nil {
+		log.Fatalf("failed to create credentials: %v", err)
+	}
+	s := grpc.NewServer(grpc.UnaryInterceptor(unaryInterceptor), grpc.Creds(creds))
 	cs := NewChatService(&ChatNotifier{}, rdsPS)
 	defer cs.Close()
 	proto.RegisterChatServer(s, cs)

@@ -1,17 +1,11 @@
-FROM serikaron/grpc-go:latest as development
+FROM serika-registry:443/go-dev as development
 
-RUN mkdir /chat
-WORKDIR /chat
+COPY proto /mse/proto
+COPY pkg /mse/pkg
+COPY chat/service /mse/chat/service
 
-COPY go.mod /chat
-RUN go mod download
-
-COPY proto /chat/proto
-COPY pkg /chat/pkg
-COPY server /chat/server
-
-RUN go generate chat/server && \
-    go build -o /chat-service chat/server
+RUN go generate mse/proto && \
+    go build -o /chat-service mse/chat/service
 
 FROM alpine:3.11 as release
 COPY --from=development /chat-service /

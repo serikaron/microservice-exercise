@@ -116,20 +116,17 @@ func (cc *CallerClient) Say(req *proto.SayReq) (*proto.SayRsp, error) {
 var (
 	host string
 	port uint
+	addr string
 )
 
 func init() {
 	flag.StringVar(&host, "chat-service-host", "chat-service", "chat service host")
 	flag.UintVar(&port, "chat-service-port", 0, "chat service port")
+	flag.Parse()
+	addr = fmt.Sprintf("%s:%d", host, port)
 }
 
 func TestChatService_Integration(t *testing.T) {
-	//host := flag.String("chat-service-host", "chat-service", "chat service host")
-	//port := flag.Uint("chat-service-port", 0, "chat service port")
-	//flag.Parse()
-	//addr := fmt.Sprintf("%s:%d", *host, *port)
-	flag.Parse()
-	addr := fmt.Sprintf("%s:%d", host, port)
 	client := pkg.NewChatClient(addr)
 	done := make(chan bool)
 	t.Run("chat service integration testing", func(t *testing.T) {
@@ -139,4 +136,12 @@ func TestChatService_Integration(t *testing.T) {
 			&SenderClient{data: nil, gotMsg: ""},
 		)
 	})
+}
+
+func TestChatService_Unauthentic(t *testing.T) {
+	client := pkg.NewChatClient(addr)
+	err := client.Say(&proto.SayReq{Msg: "should failed"})
+	if err != pkg.AuthErr {
+		t.Errorf("want err:[%v] got:[%v]", pkg.AuthErr, err)
+	}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"log"
 	"math/rand"
@@ -14,22 +15,6 @@ import (
 )
 
 //go:generate protoc -I../../proto --go_out=plugins=grpc,paths=source_relative:../../proto/ chat.proto
-
-type ChatNotifier struct{}
-
-func (cn *ChatNotifier) Notify(stream interface{}, message interface{}) error {
-	s, ok := stream.(pb.Chat_ListenServer)
-	if !ok {
-		log.Printf("ChatNotifier.Notify Not a chat stream, got:%v\n", stream)
-		return status.Error(codes.Internal, "Not a chat stream")
-	}
-	m, ok := message.(*pb.ListenRsp)
-	if !ok {
-		log.Printf("ChatNotifier.Notify Not a ListenRsp, got:%v\n", message)
-		return status.Error(codes.Internal, "Not a stream message")
-	}
-	return s.Send(m)
-}
 
 type ChatService struct {
 	name   string
@@ -87,7 +72,9 @@ func (cs *ChatService) Listen(_ *pb.ListenReq, stream pb.Chat_ListenServer) erro
 	return err
 }
 
-func (cs *ChatService) Say(_ context.Context, in *pb.SayReq) (rsp *pb.SayRsp, err error) {
+func (cs *ChatService) Say(ctx context.Context, in *pb.SayReq) (rsp *pb.SayRsp, err error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	log.Println(md)
 	log.Printf("ChatService[%s].Say in.Msg:%s", cs.name, in.Msg)
 	defer func() {
 		if err := recover(); err != nil {

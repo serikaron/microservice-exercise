@@ -2,17 +2,17 @@ version: "3.7"
 services:
   chat-service:
     build:
-      context: .
-      dockerfile: service/Dockerfile
-    image: 192.168.99.103:5000/chat-service
+      context: ../
+      dockerfile: chat/service/Dockerfile
+    image: develop/chat-service
     environment:
       - chat_service_port=23456
 
   monitor:
     build:
-      context: .
-      dockerfile: monitor/Dockerfile
-    image: 192.168.99.103:5000/monitor
+      context: ../
+      dockerfile: chat/monitor/Dockerfile
+    image: develop/monitor
     environment:
       - chat_service_port=23456
     depends_on:
@@ -20,9 +20,9 @@ services:
 
   chater:
     build:
-      context: .
-      dockerfile: chater/Dockerfile
-    image: 192.168.99.103:5000/chater
+      context: ../
+      dockerfile: chat/chater/Dockerfile
+    image: develop/chater
     environment:
       - chat_service_port=23456
     depends_on:
