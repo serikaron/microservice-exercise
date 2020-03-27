@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+  chat-test:
+    build:
+      context: $PROJECT_ROOT
+      dockerfile: scripts/docker/chat-service.test.dockerfile
+    image: chat-service-test
+    env_file:
+      - .env
+#    depends_on:
+#      - chat-service
