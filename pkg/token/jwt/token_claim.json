@@ -1,0 +1,7 @@
+{
+  "typ": "JWT",
+  "alg": "HS256",
+  "kid": 1,
+  "exp": 86400,
+  "name": "Marry"
+}

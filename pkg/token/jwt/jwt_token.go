@@ -1,51 +1,47 @@
-package pkg
+package jwt
 
 import (
 	"errors"
 	"fmt"
-	"github.com/dgrijalva/jwt-go/v4"
+	jwt_go "github.com/dgrijalva/jwt-go/v4"
 	"io"
 	"log"
+	"mse/pkg"
 	"time"
 )
 
 type CustomClaims struct {
-	Identity
-	jwt.StandardClaims
+	pkg.Identity
+	jwt_go.StandardClaims
 }
 
-type JwtToken interface {
-	Gen(identity Identity, expireInSecond uint32, signKeyReader io.Reader) (string, error)
-	Parse(tokenString string, signKeyReader io.Reader) (Identity, error)
+type JwtToken struct {
+	method jwt_go.SigningMethod
+	buf    []byte
 }
 
-func NewJwtToken() JwtToken {
-	return &jwtToken{
-		method: jwt.SigningMethodHS256,
+func NewHS256Token() *JwtToken {
+	return &JwtToken{
+		method: jwt_go.SigningMethodHS256,
 		buf:    make([]byte, 1024),
 	}
 }
 
-type jwtToken struct {
-	method jwt.SigningMethod
-	buf    []byte
-}
-
-func (jt *jwtToken) Gen(id Identity, expireInSecond uint32, signKeyReader io.Reader) (string, error) {
+func (jt *JwtToken) Gen(id pkg.Identity, expireInSecond uint32, signKeyReader io.Reader) (string, error) {
 	customClaim := CustomClaims{
 		Identity: id,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: jwt.At(time.Now().Add(time.Duration(expireInSecond))),
+		StandardClaims: jwt_go.StandardClaims{
+			ExpiresAt: jwt_go.At(time.Now().Add(time.Duration(expireInSecond))),
 		},
 	}
 
-	var token *jwt.Token
+	var token *jwt_go.Token
 	var signKey []byte
 	var err error
 	var tokenString string
 
 	func() {
-		token = jwt.NewWithClaims(jt.method, customClaim)
+		token = jwt_go.NewWithClaims(jt.method, customClaim)
 		signKey, err = jt.readKey(signKeyReader)
 		if err != nil {
 			return
@@ -56,19 +52,19 @@ func (jt *jwtToken) Gen(id Identity, expireInSecond uint32, signKeyReader io.Rea
 		}
 	}()
 
-	log.Printf("jwtToken.Gen id:%v expireIdSecond:%d signKey.len:%d tokenString:%s err:%v",
+	log.Printf("JwtToken.Gen id:%v expireIdSecond:%d signKey.len:%d tokenString:%s err:%v",
 		id, expireInSecond, len(signKey), tokenString, err)
 	return tokenString, err
 }
 
-func (jt *jwtToken) Parse(tokenString string, signKeyReader io.Reader) (Identity, error) {
+func (jt *JwtToken) Parse(tokenString string, signKeyReader io.Reader) (pkg.Identity, error) {
 	var err error
-	var token *jwt.Token
+	var token *jwt_go.Token
 	var signKey []byte
 	var claims *CustomClaims
 
 	func() {
-		token, err = jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		token, err = jwt_go.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt_go.Token) (interface{}, error) {
 			if token.Method != jt.method {
 				return nil, fmt.Errorf("method invalid")
 			}
@@ -95,7 +91,7 @@ func (jt *jwtToken) Parse(tokenString string, signKeyReader io.Reader) (Identity
 		}
 	}()
 
-	log.Printf("jwtToken.Parse tokenString:%s, token.Method:%s jt.method:%s signKey.len:%d token.Valid:%t, id:%s, error:%v",
+	log.Printf("JwtToken.Parse tokenString:%s, token.Method:%s jt.method:%s signKey.len:%d token.Valid:%t, id:%s, error:%v",
 		tokenString,
 		token.Method.Alg(), jt.method.Alg(),
 		len(signKey),
@@ -104,7 +100,7 @@ func (jt *jwtToken) Parse(tokenString string, signKeyReader io.Reader) (Identity
 	return claims.Identity, err
 }
 
-func (jw *jwtToken) readKey(reader io.Reader) (signKey []byte, err error) {
+func (jw *JwtToken) readKey(reader io.Reader) (signKey []byte, err error) {
 	var n = 0
 	for err == nil {
 		n, err = io.ReadFull(reader, jw.buf)
