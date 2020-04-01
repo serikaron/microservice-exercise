@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"github.com/dgrijalva/jwt-go/v4"
 	"google.golang.org/grpc"
 	"log"
 	"mse/pkg"
+	"mse/pkg/jwt_token"
 	"mse/proto"
 	"net"
 )
@@ -38,27 +38,12 @@ func (as *AuthService) Login(_ context.Context, in *proto.LoginReq) (*proto.Logi
 		return nil, pkg.LoginErr
 	}
 
-	type UserClaims struct {
-		Username string `json:"username"`
-		jwt.StandardClaims
-	}
-
-	customClaim := UserClaims{
-		Username: in.Username,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: jwt.NewTime(86400),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, customClaim)
-
-	tokenString, err := token.SignedString([]byte(signKey))
+	key := jwt_token.NewHS256Key("1", pkg.SignKey)
+	tokenString, err := jwt_token.Gen(pkg.Identity{Name: in.Username}, 86400, key)
 	if err != nil {
-		log.Printf("%v.Login create token failed, %v\n", as, err)
-		return nil, pkg.JWTErr
+		log.Println(err)
+		return nil, err
 	}
-
-	log.Println("tokenString:", tokenString)
 
 	return &proto.LoginRsp{Jwt: tokenString}, nil
 }

@@ -1,17 +1,17 @@
 version: "3.7"
 services:
-  auth-service:
+  auth:
     build:
       context: $PROJECT_ROOT
-      dockerfile: scripts/docker/auth-service.dockerfile
-    image: $DOCKER_REGISTRY/auth-service
+      dockerfile: scripts/docker/auth.dockerfile
+    image: $DOCKER_REGISTRY/auth
     env_file:
       - .env
 
   chat-service:
     build:
       context: $PROJECT_ROOT
-      dockerfile: scripts/docker/chat-service.dockerfile
+      dockerfile: scripts/docker/chat.dockerfile
     image: $DOCKER_REGISTRY/chat-service
     env_file:
       - .env
