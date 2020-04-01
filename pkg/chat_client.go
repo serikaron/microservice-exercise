@@ -4,7 +4,6 @@ import (
 	"context"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/oauth"
 	"io"
 	"log"
@@ -35,13 +34,14 @@ func NewChatClient(addr string) *ChatClient {
 
 	dir, _ := os.Getwd()
 	println(dir)
-	creds, err := credentials.NewClientTLSFromFile("res/certs/server.pem", "serika-server")
-	if err != nil {
-		log.Fatalf("failed to load credentials: %v", err)
-	}
+	//creds, err := credentials.NewClientTLSFromFile("res/certs/server.pem", "serika-server")
+	//if err != nil {
+	//	log.Fatalf("failed to load credentials: %v", err)
+	//}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	conn, err := grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(creds), grpc.WithBlock(), grpc.WithUnaryInterceptor(unaryInterceptor))
+	//conn, err := grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(creds), grpc.WithBlock(), grpc.WithUnaryInterceptor(unaryInterceptor))
+	conn, err := grpc.DialContext(ctx, addr, grpc.WithBlock(), grpc.WithInsecure())
 	if err != nil {
 		cancel()
 		log.Fatalln("grpc.Dial failed:", err)

@@ -15,7 +15,7 @@ services:
     image: $DOCKER_REGISTRY/chat-service
     env_file:
       - .env
-    entrypoint: /chat-service --chat-service-port $chat_service_port --redis-port 6379
+#    entrypoint: /chat-service --chat-service-port $chat_service_port --redis-port 6379
     depends_on:
       - redis
     ports:

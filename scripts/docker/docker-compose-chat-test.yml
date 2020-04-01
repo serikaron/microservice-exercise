@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+  chat:
+    build:
+      context: $PROJECT_ROOT
+      dockerfile: scripts/docker/chat.dockerfile
+    image: $DOCKER_REGISTRY/chat
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  chat-test:
+    build:
+      context: $PROJECT_ROOT
+      dockerfile: scripts/docker/chat.test.dockerfile
+    image: $DOCKER_REGISTRY/chat-test
+    env_file:
+      - .env
+    depends_on:
+      - chat
+
+  redis:
+    image: redis:alpine

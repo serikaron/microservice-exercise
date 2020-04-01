@@ -1,4 +1,4 @@
-package main
+package chat
 
 import (
 	"context"
@@ -14,18 +14,16 @@ import (
 	"time"
 )
 
-//go:generate protoc -I../../proto --go_out=plugins=grpc,paths=source_relative:../../proto/ chat.proto
-
 type ChatService struct {
 	name   string
-	hub    *ListenerHub
+	hub    *listenerHub
 	pubsub pkg.PubSub
 }
 
-func NewChatService(notifier Notifier, pubsub pkg.PubSub) *ChatService {
+func NewChatService(pubsub pkg.PubSub) *ChatService {
 	r := rand.Int()
 	name := fmt.Sprintf("%d", r)
-	hub := NewListenerHub(notifier)
+	hub := newListenerHub()
 
 	return &ChatService{
 		name:   name,
@@ -42,7 +40,7 @@ func (cs *ChatService) Run(done chan bool) {
 	d := make(chan bool)
 	go func() {
 		defer close(d)
-		cs.hub.Run(done)
+		cs.hub.run(done)
 	}()
 
 	chn := cs.pubsub.Subscribe()
@@ -60,7 +58,7 @@ func (cs *ChatService) Run(done chan bool) {
 func (cs *ChatService) Listen(_ *pb.ListenReq, stream pb.Chat_ListenServer) error {
 	log.Printf("ChatService[%s].Listen", cs.name)
 	done := make(chan error)
-	cs.hub.AddListener(&Listener{
+	cs.hub.addListener(&listener{
 		done:   done,
 		stream: stream,
 		name:   fmt.Sprintf("%d", rand.Int()),
@@ -103,5 +101,5 @@ func (cs *ChatService) notify(data []byte) {
 		log.Printf("ChatService[%s].notify unmarshal pb failed, err:%v", cs.name, err)
 		return
 	}
-	cs.hub.Notify(rsp)
+	cs.hub.notify(rsp)
 }

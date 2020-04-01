@@ -1,37 +1,32 @@
-package main
+package chat
 
 import (
 	"log"
+	"mse/proto"
 )
 
-type Notifier interface {
-	Notify(stream interface{}, message interface{}) error
-}
-
-type Listener struct {
+type listener struct {
 	name   string
-	stream interface{}
+	stream proto.Chat_ListenServer
 	done   chan error
 }
 
-type ListenerHub struct {
-	listenerMap map[string]*Listener
-	addChan     chan *Listener
-	notifyChan  chan interface{}
-	notifier    Notifier
+type listenerHub struct {
+	listenerMap map[string]*listener
+	addChan     chan *listener
+	notifyChan  chan *proto.ListenRsp
 }
 
-func NewListenerHub(notifier Notifier) *ListenerHub {
-	return &ListenerHub{
-		listenerMap: make(map[string]*Listener, 10),
-		addChan:     make(chan *Listener, 10),
-		notifyChan:  make(chan interface{}, 10),
-		notifier:    notifier,
+func newListenerHub() *listenerHub {
+	return &listenerHub{
+		listenerMap: make(map[string]*listener, 10),
+		addChan:     make(chan *listener, 10),
+		notifyChan:  make(chan *proto.ListenRsp, 10),
 	}
 }
 
-func (lh *ListenerHub) Run(done chan bool) {
-	defer log.Println("ListenerHub.Run done")
+func (lh *listenerHub) run(done chan bool) {
+	defer log.Println("listenerHub.Run done")
 	for {
 		select {
 		case <-done:
@@ -40,23 +35,23 @@ func (lh *ListenerHub) Run(done chan bool) {
 			}
 			return
 		case l := <-lh.addChan:
-			log.Printf("ListenerHub.Run add listener, name:%s", l.name)
+			log.Printf("listenerHub.Run add listener, name:%s", l.name)
 			lh.listenerMap[l.name] = l
 		case message := <-lh.notifyChan:
-			log.Printf("ListenerHub.Run notify message, message:%s", message)
-			lh.notify(message)
+			log.Printf("listenerHub.Run notify message, message:%s", message)
+			lh.send(message)
 			//default:
 			//	time.Sleep(10 * time.Millisecond)
 		}
-		log.Println("ListenerHub Running...")
+		log.Println("listenerHub Running...")
 	}
 }
 
-func (lh *ListenerHub) notify(message interface{}) {
+func (lh *listenerHub) send(message *proto.ListenRsp) {
 	for name, l := range lh.listenerMap {
-		err := lh.notifier.Notify(l.stream, message)
+		err := l.stream.Send(message)
 		if err != nil {
-			log.Printf("ListenerHub.notify error:%v", err)
+			log.Printf("listenerHub.notify error:%v", err)
 			if l.done != nil {
 				l.done <- err
 			}
@@ -65,10 +60,10 @@ func (lh *ListenerHub) notify(message interface{}) {
 	}
 }
 
-func (lh *ListenerHub) AddListener(l *Listener) {
+func (lh *listenerHub) addListener(l *listener) {
 	lh.addChan <- l
 }
 
-func (lh *ListenerHub) Notify(message interface{}) {
+func (lh *listenerHub) notify(message *proto.ListenRsp) {
 	lh.notifyChan <- message
 }

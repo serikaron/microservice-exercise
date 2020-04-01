@@ -10,7 +10,9 @@ type FlagItem interface {
 }
 
 var (
-	AuthAddr = newAddrItem("auth")
+	AuthAddr  = newAddrItem("auth")
+	ChatAddr  = newAddrItem("chat")
+	RedisAddr = newAddrItem("redis")
 )
 
 func ParseItem(itemList []FlagItem) {
