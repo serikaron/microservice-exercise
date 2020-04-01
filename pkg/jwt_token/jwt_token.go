@@ -27,13 +27,13 @@ func getId(token *jwt.Token) (string, error) {
 
 type keyFunc func(kid string) *Key
 
-type CustomClaims struct {
+type customClaims struct {
 	pkg.Identity
 	jwt.StandardClaims
 }
 
 func Gen(id pkg.Identity, expireInSecond uint64, key *Key) (string, error) {
-	customClaim := CustomClaims{
+	customClaim := customClaims{
 		Identity: id,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: jwt.At(jwt.Now().Add(time.Duration(expireInSecond) * time.Second)),
@@ -75,7 +75,7 @@ func Parse(tokenString string, f keyFunc) (pkg.Identity, error) {
 	var id pkg.Identity
 
 	func() {
-		token, err = jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		token, err = jwt.ParseWithClaims(tokenString, &customClaims{}, func(token *jwt.Token) (interface{}, error) {
 			kid := ""
 			var key *Key = nil
 			var buf []byte = nil
@@ -112,10 +112,10 @@ func Parse(tokenString string, f keyFunc) (pkg.Identity, error) {
 		}
 
 		var ok = false
-		var claims *CustomClaims
-		claims, ok = token.Claims.(*CustomClaims)
+		var claims *customClaims
+		claims, ok = token.Claims.(*customClaims)
 		if !ok {
-			err = errors.New("cast CustomClaims failed")
+			err = errors.New("cast customClaims failed")
 		}
 
 		id = claims.Identity
