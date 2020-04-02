@@ -8,6 +8,7 @@ import (
 
 func init() {
 	pkg.ChatAddr.Attach()
+	pkg.CertsPath.Attach()
 }
 
 func TestChatService(t *testing.T) {
@@ -15,7 +16,7 @@ func TestChatService(t *testing.T) {
 }
 
 func monitor_can_know_what_sender_say(t *testing.T) {
-	monitor := pkg.NewChatClient(pkg.ChatAddr.Addr())
+	monitor := pkg.NewChatClient(pkg.ChatAddr.Addr(), pkg.CertsPath.Pem())
 	listenDone := make(chan bool)
 	defer close(listenDone)
 	c, err := monitor.Listen(listenDone)
@@ -23,7 +24,7 @@ func monitor_can_know_what_sender_say(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	sender := pkg.NewChatClient(pkg.ChatAddr.Addr())
+	sender := pkg.NewChatClient(pkg.ChatAddr.Addr(), pkg.CertsPath.Pem())
 
 	err = sender.Say(&proto.SayReq{Msg: "Greetings"})
 	if err != nil {

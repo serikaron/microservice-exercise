@@ -9,6 +9,8 @@ services:
       - .env
     depends_on:
       - redis
+    deploy:
+      replicas: 2
 
   chat-test:
     build:

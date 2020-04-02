@@ -18,8 +18,6 @@ services:
 #    entrypoint: /chat-service --chat-service-port $chat_service_port --redis-port 6379
     depends_on:
       - redis
-    ports:
-      - "$chat_service_port:$chat_service_port"
 
   redis:
     image: redis:alpine

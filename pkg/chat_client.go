@@ -2,14 +2,15 @@ package pkg
 
 import (
 	"context"
-	"golang.org/x/oauth2"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/oauth"
 	"io"
 	"log"
 	"mse/proto"
-	"os"
 	"time"
+
+	"golang.org/x/oauth2"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/oauth"
 )
 
 func unaryInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
@@ -29,19 +30,17 @@ type ChatClient struct {
 	ctx    context.Context
 }
 
-func NewChatClient(addr string) *ChatClient {
+func NewChatClient(addr string, pemFile string) *ChatClient {
 	log.Println("try connect to chat-service:", addr)
 
-	dir, _ := os.Getwd()
-	println(dir)
-	//creds, err := credentials.NewClientTLSFromFile("res/certs/server.pem", "serika-server")
-	//if err != nil {
-	//	log.Fatalf("failed to load credentials: %v", err)
-	//}
+	creds, err := credentials.NewClientTLSFromFile(pemFile, "serika-server")
+	if err != nil {
+		log.Fatalf("failed to load credentials: %v", err)
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	//conn, err := grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(creds), grpc.WithBlock(), grpc.WithUnaryInterceptor(unaryInterceptor))
-	conn, err := grpc.DialContext(ctx, addr, grpc.WithBlock(), grpc.WithInsecure())
+	conn, err := grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(creds), grpc.WithBlock(), grpc.WithUnaryInterceptor(unaryInterceptor))
+	//conn, err := grpc.DialContext(ctx, addr, grpc.WithBlock(), grpc.WithInsecure())
 	if err != nil {
 		cancel()
 		log.Fatalln("grpc.Dial failed:", err)

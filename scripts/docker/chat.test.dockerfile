@@ -8,5 +8,6 @@ RUN go generate mse/proto && \
     go test -c -o /chat-test mse/test
 
 FROM alpine:3.11
+COPY res /mse/res
 COPY --from=build /chat-test /
-ENTRYPOINT /chat-test --chat-port=$chat_port
+ENTRYPOINT /chat-test --chat-port=$chat_port --cert-path $cert_path

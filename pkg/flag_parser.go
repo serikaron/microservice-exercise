@@ -13,6 +13,9 @@ var (
 	AuthAddr  = newAddrItem("auth")
 	ChatAddr  = newAddrItem("chat")
 	RedisAddr = newAddrItem("redis")
+	//ServerCertPath = &StringItem{name: "server-cert-path", def: "server.cert", desc: "server-cert-path"}
+	//ServerKeyPath  = &StringItem{name: "server-key-path", def: "server.key", desc: "server-key-path"}
+	CertsPath = &CertsPathItem{path: StringItem{name: "cert-path", def: "", desc: "cert-path"}}
 )
 
 func ParseItem(itemList []FlagItem) {
@@ -81,4 +84,20 @@ func newAddrItem(prefix string) *AddrItem {
 			Val:  0,
 		},
 	}
+}
+
+type CertsPathItem struct {
+	path StringItem
+}
+
+func (cp *CertsPathItem) Attach() {
+	cp.path.Attach()
+}
+
+func (cp *CertsPathItem) Key() string {
+	return cp.path.Val + "/server.key"
+}
+
+func (cp *CertsPathItem) Pem() string {
+	return cp.path.Val + "/server.pem"
 }

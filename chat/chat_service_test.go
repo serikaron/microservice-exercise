@@ -1,9 +1,9 @@
-package chat
+package main_test
 
 import (
 	"context"
 	"google.golang.org/grpc"
-	"mse/chat/service"
+	"mse/chat"
 	"mse/proto"
 	"testing"
 )
@@ -14,7 +14,7 @@ func TestChatService(t *testing.T) {
 
 func message_from_say_will_be_notified(t *testing.T) {
 	fakePS := &FakePubSub{c: make(chan []byte)}
-	cs := chat.NewChatService(fakePS)
+	cs := main.NewChatService(fakePS)
 	defer cs.Close()
 
 	done := make(chan bool)
