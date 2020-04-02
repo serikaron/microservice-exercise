@@ -9,8 +9,7 @@ services:
       - .env
     depends_on:
       - redis
-    deploy:
-      replicas: 2
+    entrypoint: /chat --chat-port $chat_port --chat-host "" --redis-port $redis_port --cert-path $cert_path --integration-test-enable --integration-test-key "integration-test-key"
 
   chat-test:
     build:
@@ -21,6 +20,7 @@ services:
       - .env
     depends_on:
       - chat
+    entrypoint: /chat-test --chat-port=$chat_port --cert-path $cert_path --integration-test-key "integration-test-key"
 
   redis:
     image: redis:alpine

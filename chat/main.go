@@ -22,6 +22,8 @@ func main() {
 		pkg.ChatAddr,
 		pkg.RedisAddr,
 		pkg.CertsPath,
+		pkg.IntegrationKey,
+		pkg.IntegrationEnable,
 	})
 
 	rdsPS := pkg.NewRedisPubSub(pkg.RedisAddr.Addr(), "notify")

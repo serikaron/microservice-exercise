@@ -15,7 +15,9 @@ var (
 	RedisAddr = newAddrItem("redis")
 	//ServerCertPath = &StringItem{name: "server-cert-path", def: "server.cert", desc: "server-cert-path"}
 	//ServerKeyPath  = &StringItem{name: "server-key-path", def: "server.key", desc: "server-key-path"}
-	CertsPath = &CertsPathItem{path: StringItem{name: "cert-path", def: "", desc: "cert-path"}}
+	CertsPath         = &CertsPathItem{path: StringItem{name: "cert-path", def: "", desc: "cert-path"}}
+	IntegrationKey    = &StringItem{name: "integration-test-key", def: "", desc: "integration test key"}
+	IntegrationEnable = &BoolItem{name: "integration-test-enable", def: false, desc: "integration test enable"}
 )
 
 func ParseItem(itemList []FlagItem) {
@@ -36,10 +38,6 @@ func (i *UintItem) Attach() {
 	flag.UintVar(&i.Val, i.name, i.def, i.desc)
 }
 
-func (i *UintItem) Get() interface{} {
-	return i.Val
-}
-
 type StringItem struct {
 	name string
 	def  string
@@ -51,8 +49,15 @@ func (i *StringItem) Attach() {
 	flag.StringVar(&i.Val, i.name, i.def, i.desc)
 }
 
-func (i *StringItem) Get() interface{} {
-	return i.Val
+type BoolItem struct {
+	name string
+	def  bool
+	desc string
+	Val  bool
+}
+
+func (i *BoolItem) Attach() {
+	flag.BoolVar(&i.Val, i.name, i.def, i.desc)
 }
 
 type AddrItem struct {

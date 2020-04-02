@@ -13,9 +13,10 @@ import (
 	"google.golang.org/grpc/credentials/oauth"
 )
 
-func unaryInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+func (c *ChatClient) unaryInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	opts = append(opts, grpc.PerRPCCredentials(oauth.NewOauthAccess(&oauth2.Token{
-		AccessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik1hcnJ5IiwiZXhwIjo4NjQwMH0.h7SvqoYRlXGTh8Qjc-PgZ34iukcveYXMRqGi9eBYec4",
+		//AccessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik1hcnJ5IiwiZXhwIjo4NjQwMH0.h7SvqoYRlXGTh8Qjc-PgZ34iukcveYXMRqGi9eBYec4",
+		AccessToken: c.token,
 	})))
 	//start := time.Now()
 	err := invoker(ctx, method, req, reply, cc, opts...)
@@ -24,10 +25,15 @@ func unaryInterceptor(ctx context.Context, method string, req, reply interface{}
 	return err
 }
 
+func (c *ChatClient) UpdateToken(t string) {
+	c.token = t
+}
+
 type ChatClient struct {
 	conn   *grpc.ClientConn
 	client proto.ChatClient
 	ctx    context.Context
+	token  string
 }
 
 func NewChatClient(addr string, pemFile string) *ChatClient {
@@ -38,19 +44,25 @@ func NewChatClient(addr string, pemFile string) *ChatClient {
 		log.Fatalf("failed to load credentials: %v", err)
 	}
 
+	cc := &ChatClient{}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	conn, err := grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(creds), grpc.WithBlock(), grpc.WithUnaryInterceptor(unaryInterceptor))
+	conn, err := grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(creds), grpc.WithBlock(), grpc.WithUnaryInterceptor(cc.unaryInterceptor))
 	//conn, err := grpc.DialContext(ctx, addr, grpc.WithBlock(), grpc.WithInsecure())
 	if err != nil {
 		cancel()
 		log.Fatalln("grpc.Dial failed:", err)
 	}
 
-	return &ChatClient{
-		conn:   conn,
-		client: proto.NewChatClient(conn),
-		ctx:    ctx,
-	}
+	//return &ChatClient{
+	//	conn:   conn,
+	//	client: proto.NewChatClient(conn),
+	//	ctx:    ctx,
+	//}
+
+	cc.conn = conn
+	cc.client = proto.NewChatClient(conn)
+	return cc
 }
 
 func (cc *ChatClient) Listen(done chan bool) (chan string, error) {

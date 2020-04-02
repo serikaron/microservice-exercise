@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/dgrijalva/jwt-go/v4"
 	"log"
 	"mse/pkg"
 	"reflect"
 	"time"
+
+	"github.com/dgrijalva/jwt-go/v4"
 )
 
 func getId(token *jwt.Token) (string, error) {
@@ -121,10 +122,9 @@ func Parse(tokenString string, f keyFunc) (pkg.Identity, error) {
 		id = claims.Identity
 	}()
 
-	log.Printf("JwtToken.Parse tokenString:%s, token.Method:%s token.Valid:%t, id:%v, error:%v",
+	log.Printf("JwtToken.Parse tokenString:%s, token:%v id:%v, error:%v",
 		tokenString,
-		token.Method.Alg(),
-		token.Valid,
+		token,
 		id, err)
 	return id, err
 }

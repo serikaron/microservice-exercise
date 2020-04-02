@@ -64,6 +64,10 @@ func valid(authorization []string) (*pkg.Identity, error) {
 	}
 	tokenString := strings.TrimPrefix(authorization[0], "Bearer ")
 
+	if pkg.IntegrationEnable.Val && pkg.IntegrationKey.Val == tokenString {
+		return &pkg.Identity{Name: "integration-name"}, nil
+	}
+
 	id, err := jwt_token.Parse(tokenString, func(kid string) *jwt_token.Key {
 		return jwt_token.NewHS256Key("1", pkg.SignKey)
 	})
