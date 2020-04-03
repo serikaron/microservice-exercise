@@ -26,7 +26,7 @@ func StartServer(addr string, pemFile string, keyFile string, rf registerFunc) {
 	if err != nil {
 		log.Fatalf("failed to create credentials: %v", err)
 	}
-	s := grpc.NewServer(grpc.UnaryInterceptor(unaryInterceptor), grpc.Creds(creds))
+	s := grpc.NewServer(grpc.UnaryInterceptor(unaryInterceptor), grpc.StreamInterceptor(streamInterceptor), grpc.Creds(creds))
 	//s := grpc.NewServer()
 
 	rf(s)
@@ -49,13 +49,33 @@ func unaryInterceptor(ctx context.Context, req interface{}, _ *grpc.UnaryServerI
 	if err != nil {
 		return nil, pkg.InvalidToken
 	}
-	md.Set("name", id.Name)
-	ctx = metadata.NewIncomingContext(context.Background(), md)
-	m, err := handler(ctx, req)
+	m, err := handler(context.WithValue(ctx, "name", id.Name), req)
 	if err != nil {
 		log.Printf("RPC failed with error %v", err)
 	}
 	return m, err
+}
+
+type wrappedStream struct {
+	grpc.ServerStream
+	ctx context.Context
+}
+
+func streamInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	// Call 'handler' to invoke the stream handler before this function returns
+	md, ok := metadata.FromIncomingContext(stream.Context())
+	if !ok {
+		return pkg.MissingToken
+	}
+	id, err := valid(md["authorization"])
+	if err != nil {
+		return pkg.InvalidToken
+	}
+	err = handler(srv, &wrappedStream{stream, context.WithValue(stream.Context(), "name", id.Name)})
+	if err != nil {
+		log.Printf("RPC failed with error %v", err)
+	}
+	return err
 }
 
 func valid(authorization []string) (*pkg.Identity, error) {

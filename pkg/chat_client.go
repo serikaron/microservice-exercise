@@ -24,6 +24,16 @@ func (c *ChatClient) unaryInterceptor(ctx context.Context, method string, req, r
 	//logger("RPC: %s, start time: %s, end time: %s, err: %v", method, start.Format("Basic"), end.Format(time.RFC3339), err)
 	return err
 }
+func (c *ChatClient) streamInterceptor(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+	opts = append(opts, grpc.PerRPCCredentials(oauth.NewOauthAccess(&oauth2.Token{
+		AccessToken: c.token,
+	})))
+	s, err := streamer(ctx, desc, cc, method, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
+}
 
 func (c *ChatClient) UpdateToken(t string) {
 	c.token = t
@@ -32,7 +42,6 @@ func (c *ChatClient) UpdateToken(t string) {
 type ChatClient struct {
 	conn   *grpc.ClientConn
 	client proto.ChatClient
-	ctx    context.Context
 	token  string
 }
 
@@ -46,11 +55,11 @@ func NewChatClient(addr string, pemFile string) *ChatClient {
 
 	cc := &ChatClient{}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	conn, err := grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(creds), grpc.WithBlock(), grpc.WithUnaryInterceptor(cc.unaryInterceptor))
+	//ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	conn, err := grpc.DialContext(context.Background(), addr, grpc.WithTransportCredentials(creds), grpc.WithBlock(), grpc.WithUnaryInterceptor(cc.unaryInterceptor), grpc.WithStreamInterceptor(cc.streamInterceptor))
 	//conn, err := grpc.DialContext(ctx, addr, grpc.WithBlock(), grpc.WithInsecure())
 	if err != nil {
-		cancel()
+		//cancel()
 		log.Fatalln("grpc.Dial failed:", err)
 	}
 
@@ -65,36 +74,30 @@ func NewChatClient(addr string, pemFile string) *ChatClient {
 	return cc
 }
 
-func (cc *ChatClient) Listen(done chan bool) (chan string, error) {
+func (cc *ChatClient) Listen(c chan string) error {
 	stream, err := cc.client.Listen(context.Background(), &proto.ListenReq{})
 	if err != nil {
 		log.Println("ChatClient.Listen failed:", err)
-		return nil, err
+		return err
 	}
 
-	c := make(chan string)
-	go func() {
-		defer close(c)
+	defer close(c)
 
-		for {
-			select {
-			case <-done:
-				return
-			default:
-				inf, err := stream.Recv()
-				if err == io.EOF {
-					return
-				}
-				if err != nil {
-					log.Printf("ChatClient.Listen, stream.Recv failed %v", err)
-					return
-				}
-				c <- inf.Msg
-			}
-			time.Sleep(10 * time.Millisecond)
+	for {
+		var inf *proto.ListenRsp
+		inf, err = stream.Recv()
+		if err == io.EOF {
+			err = nil
+			break
 		}
-	}()
-	return c, nil
+		if err != nil {
+			log.Printf("ChatClient.Listen, stream.Recv failed %v", err)
+			break
+		}
+		c <- inf.Msg
+		time.Sleep(10 * time.Millisecond)
+	}
+	return err
 }
 
 func (cc *ChatClient) Say(req *proto.SayReq) error {

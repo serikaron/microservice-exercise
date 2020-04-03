@@ -15,23 +15,25 @@ func init() {
 }
 
 func TestChatService(t *testing.T) {
-	t.Run("monitor_can_know_what_sender_say", monitor_can_know_what_sender_say)
-	t.Run("reject_if_token_invalid", reject_if_token_invalid)
+	//t.Run("monitor_can_know_what_sender_say", monitor_can_know_what_sender_say)
+	//t.Run("reject_to_say_if_token_invalid", reject_to_say_if_token_invalid)
+	t.Run("reject_to_listen_if_token_invalid", reject_to_listen_if_token_invalid)
 }
 
 func monitor_can_know_what_sender_say(t *testing.T) {
 	monitor := pkg.NewChatClient(pkg.ChatAddr.Addr(), pkg.CertsPath.Pem())
 	monitor.UpdateToken(pkg.IntegrationKey.Val)
-	listenDone := make(chan bool)
-	defer close(listenDone)
-	c, err := monitor.Listen(listenDone)
-	if err != nil {
-		t.Fatal(err)
-	}
+	c := make(chan string)
+	go func() {
+		err := monitor.Listen(c)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
 	sender := pkg.NewChatClient(pkg.ChatAddr.Addr(), pkg.CertsPath.Pem())
 	sender.UpdateToken(pkg.IntegrationKey.Val)
 
-	err = sender.Say(&proto.SayReq{Msg: "Greetings"})
+	err := sender.Say(&proto.SayReq{Msg: "Greetings"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,7 +44,7 @@ func monitor_can_know_what_sender_say(t *testing.T) {
 	}
 }
 
-func reject_if_token_invalid(t *testing.T) {
+func reject_to_say_if_token_invalid(t *testing.T) {
 	test := func(t *testing.T, token string, want error) {
 		sut := pkg.NewChatClient(pkg.ChatAddr.Addr(), pkg.CertsPath.Pem())
 		sut.UpdateToken(token)
@@ -60,4 +62,30 @@ func reject_if_token_invalid(t *testing.T) {
 	t.Run("invalid token", func(t *testing.T) {
 		test(t, "invalid-token", pkg.InvalidToken)
 	})
+}
+
+func reject_to_listen_if_token_invalid(t *testing.T) {
+	test := func(t *testing.T, token string, want error) {
+		sut := pkg.NewChatClient(pkg.ChatAddr.Addr(), pkg.CertsPath.Pem())
+		sut.UpdateToken(token)
+		c := make(chan string)
+
+		var err error
+		go func() {
+			err = sut.Listen(c)
+		}()
+
+		<-c
+
+		if status.Code(err) != status.Code(want) {
+			t.Fatalf("sut.Listen(_) return [%v], wants:%v", err, want)
+		}
+	}
+
+	t.Run("empty token", func(t *testing.T) {
+		test(t, "", pkg.InvalidToken)
+	})
+	//t.Run("invalid token", func(t *testing.T) {
+	//	test(t, "invalid-token", pkg.InvalidToken)
+	//})
 }

@@ -1,14 +1,16 @@
 package auth
 
 import (
-	"google.golang.org/grpc/status"
 	"mse/pkg"
 	"mse/proto"
 	"testing"
+
+	"google.golang.org/grpc/status"
 )
 
 func init() {
 	pkg.AuthAddr.Attach()
+	pkg.CertsPath.Attach()
 }
 
 func TestAuthServer_Login(t *testing.T) {
@@ -19,7 +21,7 @@ func TestAuthServer_Login(t *testing.T) {
 func login_success_with_correct_password(t *testing.T) {
 	t.Run("login_success_with_correct_password", func(t *testing.T) {
 		req := &proto.LoginReq{Username: "Marry", Password: "Marry"}
-		sut := pkg.NewAuthClient(pkg.AuthAddr.Addr())
+		sut := pkg.NewAuthClient(pkg.AuthAddr.Addr(), pkg.CertsPath.Pem())
 
 		rsp, err := sut.Login(req)
 
@@ -36,7 +38,7 @@ func login_success_with_correct_password(t *testing.T) {
 func login_failed_with_incorrect_password(t *testing.T) {
 	t.Run("login_failed_with_incorrect_password", func(t *testing.T) {
 		req := &proto.LoginReq{Username: "Marry", Password: "IncorrectPassword"}
-		sut := pkg.NewAuthClient(pkg.AuthAddr.Addr())
+		sut := pkg.NewAuthClient(pkg.AuthAddr.Addr(), pkg.CertsPath.Pem())
 
 		_, err := sut.Login(req)
 		if status.Code(err) != status.Code(pkg.LoginErr) {

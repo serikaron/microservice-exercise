@@ -4,10 +4,13 @@ package pkg
 
 import (
 	"context"
-	"google.golang.org/grpc"
 	"log"
 	"mse/proto"
 	"time"
+
+	"google.golang.org/grpc/credentials"
+
+	"google.golang.org/grpc"
 )
 
 type AuthClient struct {
@@ -16,11 +19,16 @@ type AuthClient struct {
 	ctx    context.Context
 }
 
-func NewAuthClient(addr string) *AuthClient {
+func NewAuthClient(addr string, pemFile string) *AuthClient {
 	log.Println("try connect to auth-service:", addr)
 
+	creds, err := credentials.NewClientTLSFromFile(pemFile, "serika-server")
+	if err != nil {
+		log.Fatalf("failed to load credentials: %v", err)
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	conn, err := grpc.DialContext(ctx, addr, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(creds), grpc.WithBlock())
 	if err != nil {
 		cancel()
 		log.Fatalln("grpc.Dial failed:", err)

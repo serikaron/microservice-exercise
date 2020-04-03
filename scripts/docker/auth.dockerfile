@@ -8,6 +8,7 @@ RUN go generate mse/proto && \
     go build -o /auth mse/auth
 
 FROM alpine:3.11 as release
+COPY res /mse/res
 COPY --from=development /auth /
-ENTRYPOINT /auth --auth-host "" --auth-port $auth_port
+ENTRYPOINT /auth --auth-host "" --auth-port $auth_port --cert-path $cert_path
 
