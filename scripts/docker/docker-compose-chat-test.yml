@@ -1,15 +1,15 @@
 version: "3.7"
 services:
-  chat:
-    build:
-      context: $PROJECT_ROOT
-      dockerfile: scripts/docker/chat.dockerfile
-    image: $DOCKER_REGISTRY/chat
-    env_file:
-      - .env
-    depends_on:
-      - redis
-    entrypoint: /chat --chat-port $chat_port --chat-host "" --redis-port $redis_port --cert-path $cert_path --integration-test-enable --integration-test-key "integration-test-key"
+#  chat:
+  #    build:
+  #      context: $PROJECT_ROOT
+  #      dockerfile: scripts/docker/chat.dockerfile
+  #    image: $DOCKER_REGISTRY/chat
+  #    env_file:
+  #      - .env
+  #    depends_on:
+  #      - redis
+  #    entrypoint: /chat --chat-port $chat_port --chat-host "" --redis-port $redis_port --cert-path $cert_path --integration-test-enable --integration-test-key "integration-test-key"
 
   chat-test:
     build:
@@ -19,8 +19,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - chat
-    entrypoint: /chat-test --chat-port=$chat_port --cert-path $cert_path --integration-test-key "integration-test-key"
+      - redis
+    entrypoint: /chat-test --test.run Test_monitor_can_know_what_sender_say --redis-port $redis_port
 
   redis:
     image: redis:alpine

@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"mse/chat/internal"
 	"mse/pkg"
 	"mse/pkg/helper/starter"
 	"mse/proto"
@@ -26,17 +27,10 @@ func main() {
 		pkg.IntegrationEnable,
 	})
 
-	rdsPS := pkg.NewRedisPubSub(pkg.RedisAddr.Addr(), "notify")
-
-	cs := NewChatService(rdsPS)
+	cs := internal.NewChatService(pkg.RedisAddr.Addr())
 	defer cs.Close()
 
-	done := make(chan bool)
-	go func() {
-		defer close(done)
-		starter.StartServer(pkg.ChatAddr.Addr(), pkg.CertsPath.Pem(), pkg.CertsPath.Key(), func(gs *grpc.Server) {
-			proto.RegisterChatServer(gs, cs)
-		})
-	}()
-	cs.Run(done)
+	starter.StartServer(pkg.ChatAddr.Addr(), pkg.CertsPath.Pem(), pkg.CertsPath.Key(), func(gs *grpc.Server) {
+		proto.RegisterChatServer(gs, cs)
+	})
 }
