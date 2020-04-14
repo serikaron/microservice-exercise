@@ -5,6 +5,7 @@ option go_package = "proto";
 
 service Auth {
     rpc Login (LoginReq) returns (LoginRsp);
+    rpc OAuthLogin (OAuthLoginReq) returns (OAuthLoginRsp);
 }
 
 message LoginReq {
@@ -13,5 +14,13 @@ message LoginReq {
 }
 
 message LoginRsp {
+    string jwt = 1;
+}
+
+message OAuthLoginReq {
+    string code = 1;
+}
+
+message OAuthLoginRsp {
     string jwt = 1;
 }

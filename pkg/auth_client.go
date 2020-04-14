@@ -46,9 +46,18 @@ func (ac *AuthClient) Close() {
 }
 
 func (ac *AuthClient) Login(req *proto.LoginReq) (*proto.LoginRsp, error) {
-	rsp, err := ac.client.Login(ac.ctx, req)
+	rsp, err := ac.client.Login(context.Background(), req)
 	if err != nil {
 		log.Printf("AuthClient.Login failed: %v", err)
+		return nil, err
+	}
+	return rsp, nil
+}
+
+func (ac *AuthClient) OAuthLogin(req *proto.OAuthLoginReq) (*proto.OAuthLoginRsp, error) {
+	rsp, err := ac.client.OAuthLogin(context.Background(), req)
+	if err != nil {
+		log.Printf("AuthClient.OAuthLogin failed: %v", err)
 		return nil, err
 	}
 	return rsp, nil

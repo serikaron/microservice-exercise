@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"mse/auth/internal"
 	"mse/pkg"
 )
 
@@ -10,6 +11,6 @@ func main() {
 
 	pkg.ParseItem([]pkg.FlagItem{pkg.AuthAddr, pkg.CertsPath})
 
-	s := AuthService{}
+	s := internal.AuthService{}
 	s.Run(pkg.AuthAddr.Addr(), pkg.CertsPath.Pem(), pkg.CertsPath.Key())
 }

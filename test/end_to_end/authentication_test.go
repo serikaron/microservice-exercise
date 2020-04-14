@@ -80,7 +80,7 @@ func run_monitor_chater_serially(t *testing.T) {
 
 		err := chater.Say(&proto.SayReq{Msg: "Greeting"})
 		if status.Code(err) != status.Code(pkg.MissingToken) {
-			t.Fatalf("before login chater.Say return err:%v want:%v", err, pkg.MissingToken)
+			t.Fatalf("before login client.Say return err:%v want:%v", err, pkg.MissingToken)
 		}
 
 		auth := pkg.NewAuthClient(pkg.AuthAddr.Addr(), pkg.CertsPath.Pem())
@@ -93,7 +93,7 @@ func run_monitor_chater_serially(t *testing.T) {
 
 		err = chater.Say(&proto.SayReq{Msg: "Greetings"})
 		if err != nil {
-			t.Fatalf("after login chater.Say return err:%v want:%v", err, nil)
+			t.Fatalf("after login client.Say return err:%v want:%v", err, nil)
 		}
 	}
 
