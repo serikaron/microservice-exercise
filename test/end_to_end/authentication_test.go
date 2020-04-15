@@ -102,7 +102,7 @@ func run_monitor_chater_serially(t *testing.T) {
 
 	msg := <-c1
 
-	if msg != "Greetings" {
+	if msg != "John: Greetings" {
 		t.Fatalf("monitor receive message:%s want:%s", msg, "Greetings")
 	}
 }

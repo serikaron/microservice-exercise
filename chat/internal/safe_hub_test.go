@@ -111,8 +111,16 @@ func (r *errorResult) withT(t *testing.T) *errorResult {
 
 func (r *errorResult) shouldBe(err error) *errorResult {
 	e := <-r.c
-	if e != err && e.Error() != err.Error() {
-		r.t.Fatalf("errorResult.err is %s, want %s", e.Error(), err.Error())
+	got := "<nil>"
+	if e != nil {
+		got = e.Error()
+	}
+	want := "<nil>"
+	if err != nil {
+		want = err.Error()
+	}
+	if got != want {
+		r.t.Fatalf("errorResult.err is %s, want %s", got, want)
 	}
 	return r
 }

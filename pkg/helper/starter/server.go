@@ -61,6 +61,9 @@ type wrappedStream struct {
 	ctx context.Context
 }
 
+func (w *wrappedStream) Context() context.Context {
+	return w.ctx
+}
 func streamInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	// Call 'handler' to invoke the stream handler before this function returns
 	md, ok := metadata.FromIncomingContext(stream.Context())
@@ -71,7 +74,10 @@ func streamInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.Str
 	if err != nil {
 		return pkg.InvalidToken
 	}
-	err = handler(srv, &wrappedStream{stream, context.WithValue(stream.Context(), "name", id.Name)})
+	log.Println(stream.Context())
+	newCtx := context.WithValue(stream.Context(), "name", id.Name)
+	log.Println(newCtx)
+	err = handler(srv, &wrappedStream{stream, newCtx})
 	if err != nil {
 		log.Printf("RPC failed with error %v", err)
 	}

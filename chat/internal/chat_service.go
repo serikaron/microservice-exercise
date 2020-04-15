@@ -12,7 +12,6 @@ import (
 	"github.com/go-redis/redis/v7"
 
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -59,15 +58,13 @@ func (cs *ChatService) run() {
 }
 
 func nameFromContext(ctx context.Context) (string, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
+	log.Println(ctx)
+	v := ctx.Value("name")
+	name, ok := v.(string)
 	if !ok {
-		return "", errors.New("metadata not found in context")
-	}
-	names := md["name"]
-	if len(names) < 1 {
 		return "", errors.New("name not found in metadata")
 	}
-	return names[0], nil
+	return name, nil
 }
 
 func (cs *ChatService) Listen(_ *pb.ListenReq, stream pb.Chat_ListenServer) error {

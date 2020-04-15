@@ -11,8 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"google.golang.org/grpc/metadata"
-
 	"google.golang.org/grpc"
 )
 
@@ -60,8 +58,7 @@ func say(cs *internal.ChatService, name string, msg string) {
 }
 
 func contextWithName(name string) context.Context {
-	md := metadata.Pairs("name", name)
-	return metadata.NewIncomingContext(context.Background(), md)
+	return context.WithValue(context.Background(), "name", name)
 }
 
 type spyMonitor struct {
