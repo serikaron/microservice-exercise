@@ -11,10 +11,11 @@ import (
 
 func IdentifyWithOAuth(code string) (*pkg.Identity, error) {
 	conf := &oauth2.Config{
+		RedirectURL:  "http://localhost:38080/get_code",
 		ClientID:     "hblZUghd1RBvAnvjciTMP-NkVVP1SHIzYu2NA4esL-8",
 		ClientSecret: "DBqIdw6pDU5DoyImNsJX7PMTLgXRWtnuQJiWcsP03yk",
 		Endpoint: oauth2.Endpoint{
-			TokenURL: "https://unsplash.com/oauth/t",
+			TokenURL: "https://unsplash.com/oauth/token",
 		},
 	}
 

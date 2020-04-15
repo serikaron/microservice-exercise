@@ -1,0 +1,30 @@
+version: "3.7"
+services:
+  auth:
+    image: serika-registry:443/auth
+    deploy:
+      replicas: 1
+    env_file:
+      - .env
+    ports:
+      - "10000:10000"
+
+  chat-service:
+    image: serika-registry:443/chat
+    deploy:
+      replicas: 2
+    env_file:
+      - .env
+    #    entrypoint: /chat-service --chat-service-port $chat_service_port --redis-port 6379
+    depends_on:
+      - redis
+    ports:
+      - "10010:10010"
+
+  redis:
+    image: redis:alpine
+
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"

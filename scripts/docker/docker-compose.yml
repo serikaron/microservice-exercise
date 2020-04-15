@@ -4,7 +4,7 @@ services:
     build:
       context: $PROJECT_ROOT
       dockerfile: scripts/docker/auth.dockerfile
-    image: $DOCKER_REGISTRY/auth
+    image: serika-registry:443/auth
     env_file:
       - .env
 
@@ -12,7 +12,7 @@ services:
     build:
       context: $PROJECT_ROOT
       dockerfile: scripts/docker/chat.dockerfile
-    image: $DOCKER_REGISTRY/chat-service
+    image: serika-registry:443/chat
     env_file:
       - .env
 #    entrypoint: /chat-service --chat-service-port $chat_service_port --redis-port 6379

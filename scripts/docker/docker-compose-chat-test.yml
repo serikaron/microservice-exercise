@@ -4,7 +4,7 @@ services:
   #    build:
   #      context: $PROJECT_ROOT
   #      dockerfile: scripts/docker/chat.dockerfile
-  #    image: $DOCKER_REGISTRY/chat
+  #    image: serika-registry:443/chat
   #    env_file:
   #      - .env
   #    depends_on:
@@ -15,7 +15,7 @@ services:
     build:
       context: $PROJECT_ROOT
       dockerfile: scripts/docker/chat.test.dockerfile
-    image: $DOCKER_REGISTRY/chat-test
+    image: serika-registry:443/chat-test
     env_file:
       - .env
     depends_on:
